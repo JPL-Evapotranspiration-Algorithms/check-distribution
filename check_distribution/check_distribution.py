@@ -16,7 +16,10 @@ def check_distribution(
         date_UTC: Union[date, str] = None,
         target: str = None):
     unique = np.unique(image)
-    nan_proportion = np.count_nonzero(np.isnan(image)) / np.size(image)
+    if hasattr(image, 'dtype') and np.issubdtype(image.dtype, np.floating):
+        nan_proportion = np.count_nonzero(np.isnan(image)) / np.size(image)
+    else:
+        nan_proportion = 0
 
     target_message = f" at {cl.place(target)}" if target else ""
     date_message = f" on {cl.time(f'{date_UTC:%Y-%m-%d}')}" if date_UTC else ""
