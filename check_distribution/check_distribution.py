@@ -14,7 +14,14 @@ def check_distribution(
         image: Union[Raster, np.ndarray],
         variable: str,
         date_UTC: Union[date, str] = None,
-        target: str = None):
+        target: str = None,
+        allow_blank: bool = False):
+    # Check for empty array
+    if np.size(image) == 0:
+        if not allow_blank:
+            raise BlankOutputError(f"variable {variable} is empty")
+        return
+    
     unique = np.unique(image)
     if hasattr(image, 'dtype') and np.issubdtype(image.dtype, np.floating):
         nan_proportion = np.count_nonzero(np.isnan(image)) / np.size(image)
@@ -78,5 +85,5 @@ def check_distribution(
         else:
             logger.info(message)
 
-    if nan_proportion == 1:
+    if nan_proportion == 1 and not allow_blank:
         raise BlankOutputError(f"variable {variable}{date_message}{target_message} is a blank image")
